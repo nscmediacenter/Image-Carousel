@@ -1,24 +1,28 @@
 #quote-box {
-    opacity: 0;
+    overflow: hidden;
+    background-color:rgb(217, 182, 236);
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 0 0 rgba(0,0,0,0);
-    transition: opacity 2s ease, box-shadow 2s ease;
 }
-
-#quote-box.show {
-    opacity: 1;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
-
 
 .slide-image {
     width: 100%;
-    height: 300px;       
+    height: 300px;
     object-fit: cover;
-    image-resolution: calc(600dpi);
-    border-radius: 8px;  
+    border-radius: 8px;
+
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 1s ease, opacity 0.9s ease;
 }
 
+.slide-image.show {
+    transform: translateX(0);
+    opacity: 1;
+}
 
-
+.slide-image.hide {
+    transform: translateX(-100%);
+    opacity: 0;
+}

@@ -23,49 +23,34 @@ const slides = [
 ];
 
 let index = 0;
-let toggleBackground = true;
 
 function showSlide() {
     const slideBox = document.getElementById("quote-box");
-    const slide = slides[index];
 
-    // Clear previous content
+    const img = document.createElement("img");
+    img.src = slides[index].image;
+    img.className = "slide-image";
+
     slideBox.innerHTML = "";
+    slideBox.appendChild(img);
 
-    // IMAGE SLIDE
-    if (slide.image) {
-        slideBox.innerHTML = `
-            <img src="${slide.image}" alt="Slide image" class="slide-image">
-        `;
-    }
-    // QUOTE SLIDE
-    else {
-        slideBox.innerHTML = `
-            <strong>${slide.title}</strong><br>
-            ${slide.description}
-        `;
-    }
+    // Force reflow so animation triggers
+    img.offsetHeight;
 
-    // Toggle background color
-    slideBox.style.backgroundColor = toggleBackground
-        ? "#e4d2fc"
-        : "#ffe0fb";
+    // Slide in
+    img.classList.add("show");
 
-    toggleBackground = !toggleBackground;
+    // After 4 seconds → slide out
+    setTimeout(() => {
+        img.classList.remove("show");
+        img.classList.add("hide");
+    }, 4000);
 
-    // Fade in
-    slideBox.classList.add("show");
-
-    // Prepare next index
+    // Move to next image
     index = (index + 1) % slides.length;
 
-    // Fade out
-    setTimeout(() => {
-        slideBox.classList.remove("show");
-    }, 8000);
-
-    // Next slide
-    setTimeout(showSlide, 9000);
+    // Show next slide
+    setTimeout(showSlide, 4800);
 }
 
 showSlide();
