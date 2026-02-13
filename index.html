@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Carousel</title>
+    <title>Netflix-Style Carousel</title>
     <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
 
-<div id="quote-box" class="quote-box" aria-live="polite"></div>
+<div id="carousel-container">
+    <div id="carousel-track"></div>
+
+    <!-- Navigation arrows -->
+    <button id="prev" class="nav-arrow">&#10094;</button>
+    <button id="next" class="nav-arrow">&#10095;</button>
+
+    <!-- Dots -->
+    <div id="carousel-dots"></div>
+</div>
 
 <script src="quote.js"></script>
 </body>
