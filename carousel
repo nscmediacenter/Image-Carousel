@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Netflix Style Carousel</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    body{
+        background:#111;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        min-height:100vh;
+        overflow:hidden;
+    }
+
+    /* Carousel container */
+    #carousel-container {
+        width: 100%;
+        max-width: 800px;
+        height: 300px;
+        overflow: hidden;
+        position: relative;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    /* Track */
+    #carousel-track {
+        display: flex;
+        transition: transform 0.8s ease-in-out;
+    }
+
+    /* Images */
+    #carousel-track img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    /* Navigation arrows */
+    .nav-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.4);
+        color: white;
+        border: none;
+        padding: 12px;
+        cursor: pointer;
+        font-size: 24px;
+        border-radius: 50%;
+        z-index: 10;
+    }
+
+    #prev { left: 10px; }
+    #next { right: 10px; }
+
+    /* Dots */
+    #carousel-dots {
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+    }
+
+    #carousel-dots span {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin: 0 4px;
+        background: rgba(255,255,255,0.5);
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    #carousel-dots span.active {
+        background: white;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="carousel-container">
+    <div id="carousel-track"></div>
+
+    <button id="prev" class="nav-arrow">&#10094;</button>
+    <button id="next" class="nav-arrow">&#10095;</button>
+
+    <div id="carousel-dots"></div>
+</div>
+
+<script>
+    // Slide images
+    const slides = [
+        "assets/1.JPG",
+        "assets/half.JPG",
+        "assets/3.JPG",
+        "assets/4.JPG",
+        "assets/5.JPG",
+        "assets/6.JPG",
+        "assets/7.JPG"
+    ];
+
+    const container = document.getElementById("carousel-container");
+    const track = document.getElementById("carousel-track");
+    const dotsContainer = document.getElementById("carousel-dots");
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+
+    let currentIndex = 0;
+    let slideWidth;
+
+    // Create slides
+    slides.forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        track.appendChild(img);
+    });
+
+    // Duplicate for infinite loop
+    slides.forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        track.appendChild(img);
+    });
+
+    // Create dots
+    slides.forEach((_, i) => {
+        const dot = document.createElement("span");
+
+        if(i === 0) {
+            dot.classList.add("active");
+        }
+
+        dot.addEventListener("click", () => goToSlide(i));
+
+        dotsContainer.appendChild(dot);
+    });
+
+    function setSlideWidth() {
+        slideWidth = container.clientWidth;
+        track.style.transform =
+            `translateX(-${currentIndex * slideWidth}px)`;
+    }
+
+    window.addEventListener("resize", setSlideWidth);
+    setSlideWidth();
+
+    function updateDots() {
+        const dots = dotsContainer.querySelectorAll("span");
+
+        dots.forEach(dot =>
+            dot.classList.remove("active")
+        );
+
+        dots[currentIndex % slides.length]
+            .classList.add("active");
+    }
+
+    function nextSlide() {
+        currentIndex++;
+
+        track.style.transition =
+            "transform 0.8s ease-in-out";
+
+        track.style.transform =
+            `translateX(-${currentIndex * slideWidth}px)`;
+
+        updateDots();
+
+        if (currentIndex === slides.length) {
+            setTimeout(() => {
+                track.style.transition = "none";
+                currentIndex = 0;
+
+                track.style.transform =
+                    `translateX(0px)`;
+
+                updateDots();
+            }, 800);
+        }
+    }
+
+    function prevSlide() {
+
+        if (currentIndex === 0) {
+
+            track.style.transition = "none";
+
+            currentIndex = slides.length;
+
+            track.style.transform =
+                `translateX(-${currentIndex * slideWidth}px)`;
+        }
+
+        setTimeout(() => {
+
+            currentIndex--;
+
+            track.style.transition =
+                "transform 0.8s ease-in-out";
+
+            track.style.transform =
+                `translateX(-${currentIndex * slideWidth}px)`;
+
+            updateDots();
+
+        }, 20);
+    }
+
+    nextBtn.addEventListener("click", nextSlide);
+    prevBtn.addEventListener("click", prevSlide);
+
+    // Auto slide
+    let autoSlide = setInterval(nextSlide, 3000);
+
+    // Pause on hover
+    container.addEventListener("mouseenter", () => {
+        clearInterval(autoSlide);
+    });
+
+    container.addEventListener("mouseleave", () => {
+        autoSlide = setInterval(nextSlide, 3000);
+    });
+
+    function goToSlide(i) {
+
+        currentIndex = i;
+
+        track.style.transition =
+            "transform 0.8s ease-in-out";
+
+        track.style.transform =
+            `translateX(-${currentIndex * slideWidth}px)`;
+
+        updateDots();
+    }
+
+    // Swipe support
+    let startX = 0;
+
+    container.addEventListener("touchstart", e => {
+        startX = e.touches[0].clientX;
+    });
+
+    container.addEventListener("touchend", e => {
+
+        let endX = e.changedTouches[0].clientX;
+
+        if (startX - endX > 50) {
+            nextSlide();
+        }
+        else if (endX - startX > 50) {
+            prevSlide();
+        }
+    });
+</script>
+
+</body>
+</html>
